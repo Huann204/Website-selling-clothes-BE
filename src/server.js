@@ -9,11 +9,7 @@ const connectDB = require("./config/db");
 app.use(express.json());
 
 connectDB();
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-  })
-);
+app.use(cors({ origin: "*" }));
 
 // Route đơn giản
 app.get("/", (req, res) => {
