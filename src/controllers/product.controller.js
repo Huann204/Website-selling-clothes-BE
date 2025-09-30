@@ -6,8 +6,19 @@ exports.getAllProducts = async (req, res) => {
     const { category, subcategory, page = 1, limit = 20 } = req.query;
 
     const filter = {};
-    if (category) filter.category = category;
-    if (subcategory) filter.subcategory = subcategory;
+
+    // xử lý category → gender
+    if (category) {
+      if (category === "for-her") {
+        filter.gender = { $in: ["her", "unisex"] };
+      } else if (category === "for-him") {
+        filter.gender = { $in: ["him", "unisex"] };
+      }
+    }
+
+    if (subcategory) {
+      filter.subcategory = subcategory;
+    }
 
     const products = await Product.find(filter)
       .skip((page - 1) * limit)
