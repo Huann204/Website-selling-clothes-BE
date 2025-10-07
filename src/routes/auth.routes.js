@@ -5,7 +5,7 @@ const { JWT_SECRET } = require("../../config");
 
 const router = express.Router();
 
-// Register admin (chỉ superadmin mới có thể duyệt sau)
+// Register admin
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -46,14 +46,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-// Route test: chỉ superadmin vào được
-router.get(
-  "/secret",
-  require("../middleware/auth.middleware")("superadmin"),
-  (req, res) => {
-    res.json({ message: "Chào superadmin 😎" });
-  }
-);
 
 module.exports = router;

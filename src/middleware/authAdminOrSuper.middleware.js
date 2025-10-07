@@ -9,7 +9,7 @@ function authAdminOrSuper(req, res, next) {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.admin = decoded;
 
-    // ✅ chỉ cho phép admin hoặc superadmin
+    // chỉ cho phép admin hoặc superadmin
     if (decoded.role !== "admin" && decoded.role !== "superadmin") {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }

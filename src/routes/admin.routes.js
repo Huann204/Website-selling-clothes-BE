@@ -5,7 +5,6 @@ const auth = require("../middleware/auth.middleware");
 const router = express.Router();
 
 /**
- * GET /api/admin/admins
  * Lấy danh sách tất cả admins (chỉ superadmin mới có quyền)
  */
 router.get("/", auth("superadmin"), async (req, res) => {
@@ -33,7 +32,7 @@ router.post("/", auth("superadmin"), async (req, res) => {
       email,
       password,
       role: role || "admin",
-      approved: true, // superadmin tạo thì mặc định đã duyệt
+      active: true, // superadmin tạo thì mặc định đã duyệt
     });
 
     await newAdmin.save();
