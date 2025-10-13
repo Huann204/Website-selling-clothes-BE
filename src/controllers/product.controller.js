@@ -3,7 +3,14 @@ const Product = require("../models/product.model");
 // 1. Lấy tất cả sản phẩm
 exports.getAllProducts = async (req, res) => {
   try {
-    const { category, subcategory, page = 1, limit = 20 } = req.query;
+    const {
+      category,
+      subcategory,
+      tag,
+      sort,
+      page = 1,
+      limit = 20,
+    } = req.query;
 
     const filter = {};
 
@@ -15,11 +22,16 @@ exports.getAllProducts = async (req, res) => {
         filter.gender = { $in: ["him", "unisex"] };
       }
     }
-
+    if (tag) {
+      filter.tags = tag;
+    }
     if (subcategory) {
       filter.subcategory = subcategory;
     }
-
+    let query = Product.find(filter);
+    if (sort === "newest") {
+      query = query.sort({ createdAt: -1 }); // mới nhất trước
+    }
     const products = await Product.find(filter)
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -83,5 +95,27 @@ exports.deleteProduct = async (req, res) => {
     res.json({ message: "Đã xóa sản phẩm" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.searchProducts = async (req, res) => {
+  try {
+    const q = req.query.q;
+    if (!q) return res.json([]);
+
+    const products = await Product.find({
+      $or: [
+        { title: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+        { brand: { $regex: q, $options: "i" } },
+        { origin: { $regex: q, $options: "i" } },
+        { tags: { $regex: q, $options: "i" } },
+        { "variants.color.name": { $regex: q, $options: "i" } },
+      ],
+    });
+
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server" });
   }
 };
