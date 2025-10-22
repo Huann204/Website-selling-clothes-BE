@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth.routes");
 const adminRouters = require("./routes/admin.routes");
 const orderRoutes = require("./routes/order.routes");
 const chatbotRoutes = require("./routes/chatbot.routes");
+const statsRoutes = require("./routes/stats.routes");
 require("dotenv").config();
 const config = require("../config");
 const connectDB = require("./config/db");
@@ -26,6 +27,8 @@ app.use("/api/test", test);
 app.use("/api/admin/auth", authRoutes);
 app.use("/api/admin/admins", adminRouters);
 app.use("/api/admin/orders", orderRoutes);
+app.use("/api/stats", statsRoutes);
+
 const PORT = config.PORT;
 // Server lắng nghe
 app.listen(PORT, () => {

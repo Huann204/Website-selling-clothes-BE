@@ -37,11 +37,12 @@ exports.getAllProducts = async (req, res) => {
       .limit(parseInt(limit));
 
     const total = await Product.countDocuments(filter);
-
+    const totalPages = Math.ceil(total / limit);
     return res.json({
       total,
       page: parseInt(page),
       limit: parseInt(limit),
+      totalPages,
       products,
     });
   } catch (error) {
