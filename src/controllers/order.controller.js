@@ -3,11 +3,15 @@ const Order = require("../models/order.model");
 // 1. Lấy tất cả đơn hàng
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate(
-      "items.productId"
-      // "title price stock category thumbnail"
-    );
-    res.status(200).json(orders);
+    const limit = parseInt(req.query.limit) || 0; // nếu không truyền thì lấy tất cả
+    let orders = await Order.find().populate("items.productId");
+    //đơn hàng mới nhất lên đầu
+    orders.sort((a, b) => b.createdAt - a.createdAt);
+    if (limit > 0) {
+      orders = orders.slice(0, limit);
+    }
+
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ message: "Lỗi server" });
   }
@@ -56,16 +60,25 @@ exports.deleteOrder = async (req, res) => {
 };
 
 // 5. Lấy đơn hàng theo ID
+const mongoose = require("mongoose");
+
 exports.getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID không hợp lệ" });
+    }
+
     const order = await Order.findById(id).populate("items.productId");
+
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }
+
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server" });
+    console.error("Lỗi getOrderById:", error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
 
@@ -139,6 +152,21 @@ exports.updateOrder = async (req, res) => {
     const { id } = req.params;
     const updatedData = req.body;
     const order = await Order.findByIdAndUpdate(id, updatedData, { new: true });
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+//Lấy đơn hàng theo phone
+exports.getOrderByPhone = async (req, res) => {
+  try {
+    const { phone } = req.params;
+    const order = await Order.findOne({ "customer.phone": phone }).populate(
+      "items.productId"
+    );
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }

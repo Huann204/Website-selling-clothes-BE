@@ -11,6 +11,9 @@ const orderSchema = new mongoose.Schema(
         district: { type: String, required: true },
         ward: { type: String, required: true },
         street: { type: String, required: true },
+        // Thêm 2 field này cho GHN
+        districtId: { type: Number }, // District ID của GHN
+        wardCode: { type: String }, // Ward Code của GHN
       },
     },
 
@@ -34,7 +37,7 @@ const orderSchema = new mongoose.Schema(
     payment: {
       method: {
         type: String,
-        enum: ["card", "shoppeepay", "cod", "momo"], // ATM/visa, ví, COD
+        enum: ["card", "shoppeepay", "cod", "momo"],
         required: true,
       },
       status: {
@@ -51,11 +54,12 @@ const orderSchema = new mongoose.Schema(
         enum: ["preparing", "shipping", "delivered", "cancelled"],
         default: "preparing",
       },
+      trackingNumber: { type: String },
     },
 
-    discount: { type: Number, default: 0 }, // số tiền giảm giá
-    total: { type: Number, required: true }, // tổng tiền chưa phí ship
-    grandTotal: { type: Number, required: true }, // tổng cuối cùng (cộng ship - giảm giá)
+    discount: { type: Number, default: 0 },
+    total: { type: Number, required: true },
+    grandTotal: { type: Number, required: true },
 
     status: {
       type: String,
