@@ -5,4 +5,5 @@ module.exports = {
   JWT_SECRET: process.env.JWT_SECRET,
   PORT: process.env.PORT || 5000,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  GHN_TOKEN: process.env.GHN_TOKEN,
 };
