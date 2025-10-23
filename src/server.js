@@ -8,6 +8,8 @@ const adminRouters = require("./routes/admin.routes");
 const orderRoutes = require("./routes/order.routes");
 const chatbotRoutes = require("./routes/chatbot.routes");
 const statsRoutes = require("./routes/stats.routes");
+const contact = require("./routes/contact.routes");
+const social = require("./routes/social.routes");
 require("dotenv").config();
 const config = require("../config");
 const connectDB = require("./config/db");
@@ -28,6 +30,8 @@ app.use("/api/admin/auth", authRoutes);
 app.use("/api/admin/admins", adminRouters);
 app.use("/api/admin/orders", orderRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/info", contact);
+app.use("/api/social", social);
 
 const PORT = config.PORT;
 // Server lắng nghe
