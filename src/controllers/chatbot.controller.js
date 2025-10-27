@@ -7,7 +7,7 @@ exports.chatBot = async (req, res) => {
     const products = await Product.find().lean();
     const productsWithLink = products.map((p) => ({
       ...p,
-      link: `http://localhost:5173/Detail/${p._id}`,
+      link: `https://website-selling-clothes.vercel.app/Detail/${p._id}`,
     }));
     const productList = JSON.stringify(productsWithLink, null, 2);
 
