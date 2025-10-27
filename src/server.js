@@ -10,6 +10,7 @@ const chatbotRoutes = require("./routes/chatbot.routes");
 const statsRoutes = require("./routes/stats.routes");
 const contact = require("./routes/contact.routes");
 const social = require("./routes/social.routes");
+const messagesRoutes = require("./routes/messages.routes");
 require("dotenv").config();
 const config = require("../config");
 const connectDB = require("./config/db");
@@ -32,6 +33,7 @@ app.use("/api/admin/orders", orderRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/info", contact);
 app.use("/api/social", social);
+app.use("/api/messages", messagesRoutes);
 
 const PORT = config.PORT;
 // Server lắng nghe
