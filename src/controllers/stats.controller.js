@@ -17,7 +17,7 @@ exports.getSoldProducts = async (req, res) => {
         const id = item.productId._id;
         if (!sold[id]) {
           sold[id] = {
-            productId: id,
+            productId: item.productId,
             title: item.productId.title,
             image: item.productId.thumbnail,
             price: item.productId.price,
