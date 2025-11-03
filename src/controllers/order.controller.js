@@ -172,6 +172,8 @@ exports.getOrderByPhone = async (req, res) => {
     }
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server" });
+    return res
+      .status(500)
+      .json({ message: "Lỗi server", error: error.message });
   }
 };

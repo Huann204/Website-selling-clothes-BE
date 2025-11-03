@@ -3,14 +3,7 @@ const Product = require("../models/product.model");
 // 1. Lấy tất cả sản phẩm
 exports.getAllProducts = async (req, res) => {
   try {
-    const {
-      category,
-      subcategory,
-      tag,
-      sort,
-      page = 1,
-      limit = 20,
-    } = req.query;
+    const { category, subcategory, tag, page = 1, limit = 20 } = req.query;
 
     const filter = {};
 
@@ -28,11 +21,8 @@ exports.getAllProducts = async (req, res) => {
     if (subcategory) {
       filter.subcategory = subcategory;
     }
-    let query = Product.find(filter);
-    if (sort === "newest") {
-      query = query.sort({ createdAt: -1 }); // mới nhất trước
-    }
     const products = await Product.find(filter)
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
 

@@ -14,6 +14,7 @@ exports.getSoldProducts = async (req, res) => {
 
     orders.forEach((order) => {
       order.items.forEach((item) => {
+        if (!item.productId) return;
         const id = item.productId._id;
         if (!sold[id]) {
           sold[id] = {
@@ -56,6 +57,9 @@ exports.getTopCategories = async (req, res) => {
 
     orders.forEach((order) => {
       order.items.forEach((item) => {
+        // Bỏ qua nếu sản phẩm đã bị xóa
+        if (!item.productId) return;
+
         const subcategory = item.productId.subcategory;
 
         if (!sold[subcategory]) {
@@ -84,48 +88,6 @@ exports.getTopCategories = async (req, res) => {
   }
 };
 
-// exports.getTopSoldProducts = async (req, res) => {
-//   try {
-//     const topProducts = await Order.aggregate([
-//       { $match: { status: "delivered" } }, // chỉ tính đơn giao thành công
-//       { $unwind: "$items" }, // tách từng sản phẩm trong mảng items
-//       {
-//         $group: {
-//           _id: "$items.productId",
-//           totalSold: { $sum: "$items.qty" },
-//         },
-//       },
-//       { $sort: { totalSold: -1 } },
-//       { $limit: 5 },
-//       {
-//         $lookup: {
-//           from: "products", // tên collection sản phẩm
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "product",
-//         },
-//       },
-//       { $unwind: "$product" },
-//       {
-//         $project: {
-//           _id: 0,
-//           productId: "$product._id",
-//           title: "$product.title",
-//           image: "$product.thumbnail",
-//           price: "$product.price",
-//           revenue: { $multiply: ["$product.price", "$totalSold"] },
-//           totalSold: 1,
-//         },
-//       },
-//     ]);
-
-//     res.json(topProducts);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Error fetching top sold products" });
-//   }
-// };
-
 exports.getTopSoldProducts = async (req, res) => {
   try {
     const orders = await Order.find({ status: "delivered" }).populate(
@@ -136,6 +98,9 @@ exports.getTopSoldProducts = async (req, res) => {
 
     orders.forEach((order) => {
       order.items.forEach((item) => {
+        // Bỏ qua nếu sản phẩm đã bị xóa
+        if (!item.productId) return;
+
         const id = item.productId._id;
         if (!sold[id]) {
           sold[id] = {
@@ -204,7 +169,7 @@ exports.getMonthlyStats = async (req, res) => {
 
     const stats = {};
 
-    // Gom theo tháng bằng vòng lặp JS thuần
+    // Gom theo tháng
     orders.forEach((order) => {
       const date = new Date(order.createdAt);
       const monthKey = `${date.getMonth() + 1} `;
