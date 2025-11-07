@@ -14,6 +14,7 @@ const messagesRoutes = require("./routes/messages.routes");
 require("dotenv").config();
 const config = require("../config");
 const connectDB = require("./config/db");
+const payRoutes = require("./routes/pay.routes");
 
 // Middleware để đọc JSON
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use("/api/stats", statsRoutes);
 app.use("/api/info", contact);
 app.use("/api/social", social);
 app.use("/api/messages", messagesRoutes);
+app.use("/api/pay", payRoutes);
 
 const PORT = config.PORT;
 // Server lắng nghe
