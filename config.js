@@ -6,6 +6,8 @@ module.exports = {
   PORT: process.env.PORT || 5000,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   GHN_TOKEN: process.env.GHN_TOKEN,
+  GHN_SHOP_ID: process.env.GHN_SHOP_ID,
+  PHONE_SHOP: process.env.PHONE_SHOP,
   TMN_CODE: process.env.TMN_CODE,
   HASH_SECRET: process.env.HASH_SECRET,
   VNP_URL: process.env.VNP_URL,
