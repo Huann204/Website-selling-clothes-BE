@@ -7,20 +7,22 @@ exports.getAllProducts = async (req, res) => {
 
     const filter = {};
 
-    // xử lý category → gender
-    if (category) {
-      if (category === "for-her") {
-        filter.gender = { $in: ["her", "unisex"] };
-      } else if (category === "for-him") {
-        filter.gender = { $in: ["him", "unisex"] };
-      }
+    if (category === "for-her") {
+      filter.category = { $in: ["for-her", "unisex"] };
+    } else if (category === "for-him") {
+      filter.category = { $in: ["for-him", "unisex"] };
+    } else if (category === "unisex") {
+      filter.category = "unisex";
     }
-    if (tag) {
-      filter.tags = tag;
-    }
+
     if (subcategory) {
       filter.subcategory = subcategory;
     }
+
+    if (tag) {
+      filter.tags = tag;
+    }
+
     const products = await Product.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -28,6 +30,7 @@ exports.getAllProducts = async (req, res) => {
 
     const total = await Product.countDocuments(filter);
     const totalPages = Math.ceil(total / limit);
+
     return res.json({
       total,
       page: parseInt(page),
@@ -39,11 +42,12 @@ exports.getAllProducts = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
-
 // 2. Lấy sản phẩm theo ID
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate(
+      "subcategory",
+    );
     if (!product)
       return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
     res.json(product);

@@ -6,8 +6,11 @@ const productSchema = new mongoose.Schema(
     title: { type: String, required: true },
     slug: { type: String, unique: true }, // auto-generate từ title
     category: { type: String, required: true },
-    gender: { type: String, enum: ["her", "him", "unisex"], required: true },
-    subcategory: { type: String },
+    subcategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subcategory",
+      required: true,
+    },
 
     price: { type: Number, required: true },
     salePrice: { type: Number, default: null },
@@ -56,7 +59,7 @@ const productSchema = new mongoose.Schema(
     brand: { type: String, default: "No Brand" },
     currency: { type: String, default: "VND" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // ✅ Auto-generate slug từ title

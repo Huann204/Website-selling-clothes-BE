@@ -15,6 +15,7 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const payRoutes = require("./routes/pay.routes");
 const shipRoutes = require("./routes/ship.routes");
+const subcategoryRoutes = require("./routes/subcategory.routes");
 
 // Middleware để đọc JSON
 app.use(express.json());
@@ -37,6 +38,7 @@ app.use("/api/social", social);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/pay", payRoutes);
 app.use("/api/ship", shipRoutes);
+app.use("/api/subcategories", subcategoryRoutes);
 const PORT = process.env.PORT || 5000;
 // Server lắng nghe
 app.listen(PORT, () => {
