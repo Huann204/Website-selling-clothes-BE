@@ -7,7 +7,7 @@ exports.getSoldProducts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 0; // nếu không truyền thì lấy tất cả
 
     const orders = await Order.find({ status: "delivered" }).populate(
-      "items.productId"
+      "items.productId",
     );
 
     const sold = {};
@@ -49,9 +49,12 @@ exports.getSoldProducts = async (req, res) => {
 exports.getTopCategories = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
-    const orders = await Order.find({ status: "delivered" }).populate(
-      "items.productId"
-    );
+    const orders = await Order.find({ status: "delivered" }).populate({
+      path: "items.productId",
+      populate: {
+        path: "subcategory",
+      },
+    });
 
     const sold = {};
 
@@ -61,16 +64,16 @@ exports.getTopCategories = async (req, res) => {
         if (!item.productId) return;
 
         const subcategory = item.productId.subcategory;
-
-        if (!sold[subcategory]) {
-          sold[subcategory] = {
+        const subId = subcategory._id.toString();
+        if (!sold[subId]) {
+          sold[subId] = {
             subcategory,
             totalSold: 0,
             revenue: 0,
           };
         }
-        sold[subcategory].totalSold += item.qty;
-        sold[subcategory].revenue += item.productId.price * item.qty;
+        sold[subId].totalSold += item.qty;
+        sold[subId].revenue += item.productId.price * item.qty;
       });
     });
 
@@ -91,7 +94,7 @@ exports.getTopCategories = async (req, res) => {
 exports.getTopSoldProducts = async (req, res) => {
   try {
     const orders = await Order.find({ status: "delivered" }).populate(
-      "items.productId"
+      "items.productId",
     );
 
     const sold = {};
@@ -186,7 +189,7 @@ exports.getMonthlyStats = async (req, res) => {
     });
 
     const result = Object.values(stats).sort((a, b) =>
-      a.month.localeCompare(b.month)
+      a.month.localeCompare(b.month),
     );
 
     res.json(result);
@@ -201,7 +204,7 @@ exports.getStatsAll = async (req, res) => {
   try {
     // Lấy toàn bộ đơn hàng giao thành công
     const orders = await Order.find({ status: "delivered" }).populate(
-      "items.productId"
+      "items.productId",
     );
 
     // Lấy tổng số sản phẩm đang có
@@ -248,7 +251,7 @@ exports.getOverviewStats = async (req, res) => {
       0,
       23,
       59,
-      59
+      59,
     );
     const startOfPreviousMonth = new Date(previousYear, previousMonth, 1);
     const endOfPreviousMonth = new Date(
@@ -257,7 +260,7 @@ exports.getOverviewStats = async (req, res) => {
       0,
       23,
       59,
-      59
+      59,
     );
 
     // Lấy đơn hàng tháng hiện tại và tháng trước
@@ -274,11 +277,11 @@ exports.getOverviewStats = async (req, res) => {
     // Doanh thu
     const totalRevenue = currentOrders.reduce(
       (sum, o) => sum + (o.grandTotal || 0),
-      0
+      0,
     );
     const previousRevenue = previousOrders.reduce(
       (sum, o) => sum + (o.grandTotal || 0),
-      0
+      0,
     );
 
     //Đơn hàng

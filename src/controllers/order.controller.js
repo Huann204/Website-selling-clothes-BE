@@ -87,7 +87,7 @@ exports.getOrdersByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
     const orders = await Order.find({ "customer.id": userId }).populate(
-      "items.productId"
+      "items.productId",
     );
     res.status(200).json(orders);
   } catch (error) {
@@ -165,7 +165,7 @@ exports.getOrderByPhone = async (req, res) => {
   try {
     const { phone } = req.params;
     const order = await Order.findOne({ "customer.phone": phone }).populate(
-      "items.productId"
+      "items.productId",
     );
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });

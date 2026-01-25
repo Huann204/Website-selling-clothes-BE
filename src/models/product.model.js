@@ -4,7 +4,7 @@ const slugify = require("slugify");
 const productSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    slug: { type: String, unique: true }, // auto-generate từ title
+    slug: { type: String, unique: true },
     category: { type: String, required: true },
     subcategory: {
       type: mongoose.Schema.Types.ObjectId,
@@ -62,7 +62,6 @@ const productSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// ✅ Auto-generate slug từ title
 productSchema.pre("validate", function (next) {
   if (this.title) {
     this.slug = slugify(this.title, { lower: true, strict: true });
