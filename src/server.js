@@ -12,7 +12,6 @@ const contact = require("./routes/contact.routes");
 const social = require("./routes/social.routes");
 const messagesRoutes = require("./routes/messages.routes");
 require("dotenv").config();
-const config = require("../config");
 const connectDB = require("./config/db");
 const payRoutes = require("./routes/pay.routes");
 const shipRoutes = require("./routes/ship.routes");
