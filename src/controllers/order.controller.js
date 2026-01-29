@@ -1,5 +1,5 @@
 const Order = require("../models/order.model");
-
+const Product = require("../models/product.model");
 // 1. Lấy tất cả đơn hàng
 exports.getAllOrders = async (req, res) => {
   try {
@@ -29,19 +29,91 @@ exports.createOrder = async (req, res) => {
 };
 
 // 3. Cập nhật trạng thái đơn hàng
+
 exports.updateOrderStatus = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    const order = await Order.findById(id);
+    const { status, shipping } = req.body;
+
+    const order = await Order.findById(id).session(session);
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }
+
+    // nếu đã trừ stock rồi thì không cho trừ nữa
+    if (status === "confirmed" && order.stockDeducted) {
+      return res
+        .status(400)
+        .json({ message: "Đơn hàng đã được trừ stock trước đó" });
+    }
+
+    // CHỈ trừ stock khi confirmed
+    if (status === "confirmed") {
+      for (const item of order.items) {
+        const product = await Product.findById(item.productId).session(session);
+        if (!product) {
+          throw new Error("Không tìm thấy sản phẩm");
+        }
+
+        // tìm đúng màu
+        const variant = product.variants.find(
+          (v) => v.color.name === item.color,
+        );
+
+        if (!variant) {
+          throw new Error(
+            `Không tìm thấy màu ${item.color} của sản phẩm ${product.title}`,
+          );
+        }
+
+        // tìm đúng size
+        const sizeObj = variant.sizes.find((s) => s.size === item.size);
+
+        if (!sizeObj) {
+          throw new Error(
+            `Không tìm thấy size ${item.size} của sản phẩm ${product.title}`,
+          );
+        }
+
+        // check stock
+        if (sizeObj.stock < item.qty) {
+          throw new Error(
+            `Không đủ tồn kho: ${product.title} - ${item.color}/${item.size}`,
+          );
+        }
+
+        // TRỪ STOCK
+        sizeObj.stock -= item.qty;
+
+        await product.save({ session });
+      }
+
+      order.stockDeducted = true;
+    }
+
+    // cập nhật trạng thái
     order.status = status;
-    await order.save();
+    if (shipping) {
+      order.shipping = {
+        ...order.shipping,
+        trackingNumber: shipping.trackingNumber,
+      };
+    }
+    await order.save({ session });
+
+    await session.commitTransaction();
+
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server" });
+    await session.abortTransaction();
+    res.status(400).json({
+      message: error.message || "Cập nhật trạng thái thất bại",
+    });
+  } finally {
+    session.endSession();
   }
 };
 
