@@ -1,4 +1,5 @@
 const Product = require("../models/product.model");
+const Subcategory = require("../models/subcategory.model");
 
 // 1. Lấy tất cả sản phẩm
 exports.getAllProducts = async (req, res) => {
@@ -6,24 +7,34 @@ exports.getAllProducts = async (req, res) => {
     const { category, subcategory, tag, page = 1, limit = 20 } = req.query;
 
     const filter = {};
-
-    if (category === "for-her") {
-      filter.category = { $in: ["for-her", "unisex"] };
-    } else if (category === "for-him") {
-      filter.category = { $in: ["for-him", "unisex"] };
-    } else if (category === "unisex") {
-      filter.category = "unisex";
+    if (category) {
+      let subCategoriesToFind = [];
+      if (category === "for-her") {
+        subCategoriesToFind = ["for-her", "unisex"];
+      } else if (category === "for-him") {
+        subCategoriesToFind = ["for-him", "unisex"];
+      } else if (category === "unisex") {
+        subCategoriesToFind = ["unisex"];
+      }
+      const subs = await Subcategory.find({
+        category: { $in: subCategoriesToFind },
+        status: true,
+      }).select("_id");
+      filter.subcategory = { $in: subs.map((sub) => sub._id) };
     }
-
     if (subcategory) {
-      filter.subcategory = subcategory;
+      if (Array.isArray(subcategory)) {
+        filter.subcategory = { $in: subcategory };
+      } else {
+        filter.subcategory = subcategory;
+      }
     }
-
     if (tag) {
       filter.tags = tag;
     }
 
     const products = await Product.find(filter)
+      .populate("subcategory")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
