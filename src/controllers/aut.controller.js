@@ -51,14 +51,12 @@ exports.loginAdmin = async (req, res) => {
 
 //đăng xuất admin
 exports.logoutAdmin = (req, res) => {
-  exports.logoutAdmin = (req, res) => {
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: isProduction ? "none" : "lax",
-    });
-    res.json({ message: "Đăng xuất thành công" });
-  };
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
+
   res.json({ message: "Đăng xuất thành công" });
 };
 
