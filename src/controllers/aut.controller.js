@@ -48,12 +48,11 @@ exports.loginAdmin = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 //đăng xuất admin
 exports.logoutAdmin = (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: isProduction,
+    secure: true,
     sameSite: isProduction ? "none" : "lax",
   });
 
