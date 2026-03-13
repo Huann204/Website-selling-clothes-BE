@@ -53,10 +53,9 @@ exports.updateAdmin = async (req, res) => {
 // Xoá admin
 exports.deleteAdmin = async (req, res) => {
   try {
-    const admin = await Admin.findById(req.params.id);
+    const admin = await Admin.findByIdAndDelete(req.params.id);
     if (!admin)
       return res.status(404).json({ message: "Không tìm thấy admin" });
-    await admin.remove();
     res.json({ message: "Xoá admin thành công" });
   } catch (err) {
     res.status(500).json({ message: err.message });

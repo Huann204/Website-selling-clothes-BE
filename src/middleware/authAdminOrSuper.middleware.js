@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../config");
 function authAdminOrSuper(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies?.accessToken;
   if (!token) return res.status(401).json({ message: "Không có token" });
 
   try {

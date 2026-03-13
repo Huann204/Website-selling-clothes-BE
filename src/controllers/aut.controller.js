@@ -2,6 +2,7 @@ const Admin = require("../models/admin.model");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../config");
 const bcrypt = require("bcrypt");
+const isProduction = process.env.NODE_ENV === "production";
 // Đăng ký admin
 exports.registerAdmin = async (req, res) => {
   try {
@@ -25,10 +26,43 @@ exports.loginAdmin = async (req, res) => {
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch)
       return res.status(400).json({ message: "Mật khẩu không đúng" });
-    const token = jwt.sign({ id: admin._id, role: admin.role }, JWT_SECRET, {
-      expiresIn: "1d",
+    const accessToken = jwt.sign(
+      { id: admin._id, role: admin.role },
+      JWT_SECRET,
+      {
+        expiresIn: "15m",
+      },
+    );
+    if (!admin.active)
+      return res
+        .status(403)
+        .json({ message: "Tài khoản chưa được duyệt, liên hệ superadmin" });
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 15 * 60 * 1000, // 15 phút
     });
-    res.json({ message: "Đăng nhập thành công", token });
+    res.json({ message: "Đăng nhập thành công" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//đăng xuất admin
+exports.logoutAdmin = (req, res) => {
+  res.clearCookie("accessToken");
+  res.json({ message: "Đăng xuất thành công" });
+};
+
+exports.infoAdmin = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin.id);
+    res.json({
+      name: admin.name,
+      email: admin.email,
+      role: admin.role,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const cookieParser = require("cookie-parser");
 const test = require("./routes/test.routes");
 const productRoutes = require("./routes/product.routes");
 const authRoutes = require("./routes/auth.routes");
@@ -20,8 +21,15 @@ const subcategoryRoutes = require("./routes/subcategory.routes");
 // Middleware để đọc JSON
 app.use(express.json());
 
+// Middleware để đọc cookie
+app.use(cookieParser());
 connectDB();
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: process.env.API_URL_CLIENT,
+    credentials: true,
+  }),
+);
 
 app.get("/", (req, res) => {
   res.send("Hello Node.js Backend!");
