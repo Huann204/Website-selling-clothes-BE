@@ -27,7 +27,6 @@ app.use(
   cors({
     origin: process.env.API_URL_CLIENT,
     credentials: true,
-    path: "/",
   }),
 );
 

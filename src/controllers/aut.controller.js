@@ -2,7 +2,6 @@ const Admin = require("../models/admin.model");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../config");
 const bcrypt = require("bcrypt");
-const isProduction = process.env.NODE_ENV === "production";
 // Đăng ký admin
 exports.registerAdmin = async (req, res) => {
   try {
@@ -40,7 +39,7 @@ exports.loginAdmin = async (req, res) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, // 15 phút
     });
     res.json({ message: "Đăng nhập thành công" });
@@ -53,7 +52,7 @@ exports.logoutAdmin = (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: true,
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: "none",
   });
 
   res.json({ message: "Đăng xuất thành công" });
