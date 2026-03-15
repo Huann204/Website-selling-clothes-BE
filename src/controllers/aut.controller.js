@@ -25,6 +25,10 @@ exports.loginAdmin = async (req, res) => {
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch)
       return res.status(400).json({ message: "Mật khẩu không đúng" });
+    if (!admin.active)
+      return res
+        .status(403)
+        .json({ message: "Tài khoản chưa được duyệt, liên hệ superadmin" });
     const accessToken = jwt.sign(
       { id: admin._id, role: admin.role },
       JWT_SECRET,
@@ -32,14 +36,10 @@ exports.loginAdmin = async (req, res) => {
         expiresIn: "15m",
       },
     );
-    if (!admin.active)
-      return res
-        .status(403)
-        .json({ message: "Tài khoản chưa được duyệt, liên hệ superadmin" });
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
+      sameSite: "None",
       maxAge: 15 * 60 * 1000, // 15 phút
     });
     res.json({ message: "Đăng nhập thành công" });
@@ -52,7 +52,7 @@ exports.logoutAdmin = (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "None",
   });
 
   res.json({ message: "Đăng xuất thành công" });
