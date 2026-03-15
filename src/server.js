@@ -17,18 +17,19 @@ const connectDB = require("./config/db");
 const payRoutes = require("./routes/pay.routes");
 const shipRoutes = require("./routes/ship.routes");
 const subcategoryRoutes = require("./routes/subcategory.routes");
-// Middleware để đọc JSON
-app.use(express.json());
 
-// Middleware để đọc cookie
-app.use(cookieParser());
-connectDB();
 app.use(
   cors({
     origin: process.env.API_URL_CLIENT,
     credentials: true,
   }),
 );
+// Middleware để đọc JSON
+app.use(express.json());
+
+// Middleware để đọc cookie
+app.use(cookieParser());
+connectDB();
 
 app.get("/", (req, res) => {
   res.send("Hello Node.js Backend!");
